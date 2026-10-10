@@ -1,0 +1,29 @@
+name: build
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install dependencies
+      run: >
+        sudo apt install meson libvulkan-dev libglm-dev libassimp-dev
+        libxcb1-dev libxcb-icccm4-dev libwayland-dev wayland-protocols
+        libdrm-dev libgbm-dev
+    - name: Setup
+      run: meson setup build
+    - name: Build
+      run: ninja -C build
+    - name: Run tests
+      run: meson test -v -C build
